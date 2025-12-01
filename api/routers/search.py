@@ -14,4 +14,8 @@ search_service = SearchService(
 
 @router.post("/search", response_model=SearchResponse)
 def search(request: SearchRequest):
-    return search_service.search(request.query, request.limit)
+    return search_service.search(
+        request.query,
+        request.limit,
+        request.filter,
+    )
