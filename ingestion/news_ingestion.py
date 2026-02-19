@@ -9,11 +9,11 @@ from utils.simple_chunker import SimpleChunker
 
 load_dotenv()
 
-DENSE_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+DENSE_MODEL = "intfloat/multilingual-e5-large"
 SPARSE_MODEL = "Qdrant/bm25"
 COLBERT_MODEL = "colbert-ir/colbertv2.0"
 COLLECTION_NAME = "financial"
-MAX_TOKENS = 300
+MAX_TOKENS = 500
 
 qdrant = QdrantClient(
     url=os.getenv("QDRANT_URL"),

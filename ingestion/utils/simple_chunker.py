@@ -4,8 +4,8 @@ from transformers import AutoTokenizer
 class SimpleChunker:
     def __init__(
         self,
-        model_name: str = "sentence-transformers/all-MiniLM-L6-v2",
-        max_tokens: int = 300,
+        model_name: str = "intfloat/multilingual-e5-large",
+        max_tokens: int = 500,
     ):
         self.max_tokens = max_tokens
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)

@@ -6,15 +6,16 @@ from sentence_transformers import SentenceTransformer
 from transformers import AutoTokenizer
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
+warnings.filterwarnings(action="ignore")
 
 
 class SemanticChunker:
     def __init__(
         self,
-        model_name: str = "sentence-transformers/all-MiniLM-L6-v2",
+        model_name: str = "intfloat/multilingual-e5-large",
         min_cluster_size: int = 3,
         orphan_cluster_size: int = 2,
-        max_tokens: int = 300,
+        max_tokens: int = 500,
     ):
         self.model = SentenceTransformer(model_name)
         self.model.max_seq_length = 512
@@ -57,9 +58,22 @@ class SemanticChunker:
                     current_tokens += para_tokens
 
             if current_chunk:
-                chunks.append("\n\n".join(current_chunk))
+                joined = "\n\n".join(current_chunk)
+                chunks.extend(self._split_long_paragraph(joined))
 
         return chunks, orphans
+
+    def _split_long_paragraph(self, text: str) -> list[str]:
+        tokens = self.tokenizer.encode(text, add_special_tokens=False)
+        if len(tokens) <= self.max_tokens:
+            return [text]
+
+        chunks = []
+        for i in range(0, len(tokens), self.max_tokens):
+            chunk_tokens = tokens[i : i + self.max_tokens]
+            chunks.append(self.tokenizer.decode(chunk_tokens, skip_special_tokens=True))
+
+        return chunks
 
     def create_chunks(self, text_content: str):
         paragraphs = [
@@ -67,6 +81,11 @@ class SemanticChunker:
         ]
         if not paragraphs:
             return []
+
+        split_paragraphs = []
+        for p in paragraphs:
+            split_paragraphs.extend(self._split_long_paragraph(p))
+        paragraphs = split_paragraphs
 
         final_chunks, orphans = self._cluster_and_process(
             paragraphs, self.min_cluster_size

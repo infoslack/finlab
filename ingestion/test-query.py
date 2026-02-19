@@ -6,7 +6,7 @@ from qdrant_client import QdrantClient, models
 
 load_dotenv()
 
-DENSE_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+DENSE_MODEL = "intfloat/multilingual-e5-large"
 SPARSE_MODEL = "Qdrant/bm25"
 COLBERT_MODEL = "colbert-ir/colbertv2.0"
 COLLECTION_NAME = "financial"
@@ -20,7 +20,7 @@ dense_model = TextEmbedding(DENSE_MODEL)
 sparse_model = SparseTextEmbedding(SPARSE_MODEL)
 colbert_model = LateInteractionTextEmbedding(COLBERT_MODEL)
 
-query_text = "what are the main financial risks?"
+query_text = "AAPL financial risks"
 query_dense = list(dense_model.query_embed([query_text]))[0].tolist()
 query_sparse = list(sparse_model.query_embed([query_text]))[0].as_object()
 query_colbert = list(colbert_model.query_embed([query_text]))[0].tolist()
@@ -40,6 +40,13 @@ results = qdrant.query_points(
     query=query_colbert,
     using="colbert",
     limit=3,
+    search_params=models.SearchParams(
+        quantization=models.QuantizationSearchParams(
+            ignore=False,
+            rescore=True,
+            oversampling=1.5,
+        )
+    ),
 )
 
 max_score = max(result.score for result in results.points)
