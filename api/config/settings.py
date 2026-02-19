@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     qdrant_url: str
     qdrant_api_key: str
     collection_name: str = "financial"
-    dense_model: str = "sentence-transformers/all-MiniLM-L6-v2"
+    dense_model: str = "intfloat/multilingual-e5-large"
     sparse_model: str = "Qdrant/bm25"
     colbert_model: str = "colbert-ir/colbertv2.0"
     groq_api_key: str
